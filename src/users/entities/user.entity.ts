@@ -1,7 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
-// export type CatDocument = Cat & Document;
-
 @Schema()
 export class User {
   @Prop({ required: true, unique: true })
@@ -12,6 +10,9 @@ export class User {
 
   @Prop({ required: true, unique: true })
   phoneNumber: string;
+
+  @Prop({ required: true, unique: true })
+  username: string;
 
   @Prop()
   avatar: string;
@@ -27,6 +28,15 @@ export class User {
 
   @Prop()
   friends: string;
+
+  @Prop()
+  county: string;
+
+  @Prop()
+  city: string;
+
+  @Prop()
+  status: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

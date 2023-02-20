@@ -3,6 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 // import { ConfigService } from '@nestjs/config';
 import { UsersService } from '../users/users.service';
+import { ObjectId } from 'mongoose';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -23,7 +24,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
    * Метод validate должен вернуть данные пользователя
    * В JWT стратегии в качестве параметра метод получает полезную нагрузку из токена
    */
-  async validate(jwtPayload: { sub: string }) {
+  async validate(jwtPayload: { sub: ObjectId }) {
     /* В subject токена будем передавать идентификатор пользователя */
     const user = this.usersService.findOne(jwtPayload.sub);
 

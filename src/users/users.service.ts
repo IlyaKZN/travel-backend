@@ -1,4 +1,4 @@
-import { Model } from 'mongoose';
+import { Model, ObjectId } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './entities/user.entity';
@@ -26,15 +26,17 @@ export class UsersService {
     return this.userModel.findOne({ email });
   }
 
-  findOne(id: string) {
+  findOne(id: ObjectId) {
     return this.userModel.findById(id);
   }
 
-  update(id: string, updateUserDto: UpdateUserDto) {
-    return this.userModel.findByIdAndUpdate(id, updateUserDto);
+  update(id: ObjectId, updateUserDto: UpdateUserDto) {
+    return this.userModel.findByIdAndUpdate(id, updateUserDto, {
+      returnDocument: 'after',
+    });
   }
 
-  remove(id: string) {
+  remove(id: ObjectId) {
     return this.userModel.findByIdAndRemove(id);
   }
 }

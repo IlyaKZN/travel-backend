@@ -20,17 +20,36 @@ export class AuthController {
   signin(@Req() req) {
     /* Генерируем для пользователя JWT токен */
     const { access_token: accessToken } = this.authService.auth(req.user);
+    const { email, phoneNumber, username, birthDate, _id } = req.user;
+
     return {
       accessToken,
-      user: req.user,
+      user: {
+        email,
+        phoneNumber,
+        username,
+        birthDate,
+        _id,
+      },
     };
   }
 
   @Post('signup')
   async signup(@Body() createUserDto: CreateUserDto) {
-    /* При регистрации, создаём пользователя и генерируем для него токен */
     const user = await this.usersService.create(createUserDto);
 
-    return this.authService.auth(user);
+    const accessToken = this.authService.auth(user);
+    const { email, phoneNumber, username, birthDate, _id } = user;
+
+    return {
+      accessToken,
+      user: {
+        email,
+        phoneNumber,
+        username,
+        birthDate,
+        _id,
+      },
+    };
   }
 }

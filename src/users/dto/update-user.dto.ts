@@ -8,9 +8,9 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
   avatar: string;
   firstName: string;
   lastName: string;
-  birthDate: string;
+  birthDate: Date;
   friends: string;
-  county: string;
+  country: string;
   city: string;
   status: string;
 }

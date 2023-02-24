@@ -18,13 +18,10 @@ export class AuthService {
     return { access_token: this.jwtService.sign(payload) };
   }
 
-  async validatePassword(email: string, password: string) {
-    const user = await this.usersService.findByEmail(email);
-    const isPasswordsMatched = await compare(password, user.password);
+  async validatePassword(username: string, password: string) {
+    const user = await this.usersService.findByUsername(username);
 
-    // if (!isPasswordsMathced) {
-    //   throw new BadRequestException('Неправильный логин или пароль');
-    // }
+    const isPasswordsMatched = await compare(password, user.password);
 
     if (user && isPasswordsMatched) {
       delete user.password;

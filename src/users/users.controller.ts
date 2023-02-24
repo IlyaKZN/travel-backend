@@ -47,8 +47,6 @@ export class UsersController {
     @Req() req: { user: User & { _id: ObjectId } },
     @Body() updateUserDto: UpdateUserDto,
   ) {
-    console.log(req.user);
-
     return this.usersService.update(req.user._id, updateUserDto);
   }
 

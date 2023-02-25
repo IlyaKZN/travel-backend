@@ -11,26 +11,17 @@ export class AuthController {
     private authService: AuthService,
   ) {}
 
-  /**
-   * Стратегия local автоматически достанет email и password из тела запроса
-   * Если пароль будет верным, данные пользователя окажутся в объекте req.user
-   */
   @UseGuards(LocalGuard)
   @Post('signin')
   signin(@Req() req) {
-    /* Генерируем для пользователя JWT токен */
     const { access_token: accessToken } = this.authService.auth(req.user);
-    const { email, phoneNumber, username, birthDate, _id } = req.user;
+    const { ...rest } = req.user;
+
+    delete rest._doc.password;
 
     return {
       accessToken,
-      user: {
-        email,
-        phoneNumber,
-        username,
-        birthDate,
-        _id,
-      },
+      user: rest._doc,
     };
   }
 
@@ -39,17 +30,10 @@ export class AuthController {
     const user = await this.usersService.create(createUserDto);
 
     const accessToken = this.authService.auth(user);
-    const { email, phoneNumber, username, birthDate, _id } = user;
 
     return {
       accessToken,
-      user: {
-        email,
-        phoneNumber,
-        username,
-        birthDate,
-        _id,
-      },
+      user,
     };
   }
 }

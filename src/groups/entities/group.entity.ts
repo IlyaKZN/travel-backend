@@ -24,6 +24,15 @@ export class Group {
     ],
   })
   participants: User[];
+
+  @Prop()
+  numberParticipants: number;
+
+  @Prop()
+  minAge: number;
+
+  @Prop()
+  maxAge: number;
 }
 
 export const GroupSchema = SchemaFactory.createForClass(Group);

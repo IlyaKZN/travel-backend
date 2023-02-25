@@ -12,6 +12,7 @@ import {
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { SearchUserDto } from './dto/search-user.dto';
 import { JwtGuard } from 'src/guards/jwt.guard';
 import { User } from './entities/user.entity';
 import { ObjectId } from 'mongoose';
@@ -26,14 +27,24 @@ export class UsersController {
     return req.user;
   }
 
+  @UseGuards(JwtGuard)
+  @Post('/search')
+  search(
+    @Body() searchUserDto: SearchUserDto,
+    @Req() req: { user: User & { _id: ObjectId } },
+  ) {
+    return this.usersService.search(searchUserDto, req.user._id);
+  }
+
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }
 
+  @UseGuards(JwtGuard)
   @Get()
-  findAll() {
-    return this.usersService.findAll();
+  findAll(@Req() req: { user: User & { _id: ObjectId } }) {
+    return this.usersService.findAll(req.user._id);
   }
 
   @Get(':id')
@@ -54,4 +65,15 @@ export class UsersController {
   remove(@Param('id') id: ObjectId) {
     return this.usersService.remove(id);
   }
+
+  // @UseGuards(JwtGuard)
+  // @Patch('/subscribe')
+  // subscribe(
+  //   @Req() req: { user: User & { _id: ObjectId } },
+  //   @Body() subscribeUserDto: SubscribeUserDto,
+  // ) {
+  //   return this.usersService.update(req.user._id, {
+  //     subscriptions: [subscribeUserDto.]
+  //   })
+  // }
 }

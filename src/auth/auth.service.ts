@@ -24,7 +24,6 @@ export class AuthService {
     const isPasswordsMatched = await compare(password, user.password);
 
     if (user && isPasswordsMatched) {
-      delete user.password;
       return user;
     }
 

@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import { HydratedDocument, Schema as MongooseSchema } from 'mongoose';
+import { Group } from 'src/groups/entities/group.entity';
 
 export type UserDocument = HydratedDocument<User>;
 
@@ -8,7 +9,7 @@ export class User {
   @Prop({ required: true, unique: true })
   email: string;
 
-  @Prop({ required: true })
+  @Prop({ required: true, select: false })
   password: string;
 
   @Prop({ required: true, unique: true })
@@ -40,6 +41,21 @@ export class User {
 
   @Prop()
   status: string;
+
+  @Prop({
+    type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Group' }],
+  })
+  groups: Group[];
+
+  @Prop({
+    type: [{ type: MongooseSchema.Types.ObjectId, ref: 'User' }],
+  })
+  subscribers: User[];
+
+  @Prop({
+    type: [{ type: MongooseSchema.Types.ObjectId, ref: 'User' }],
+  })
+  subscriptions: User[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

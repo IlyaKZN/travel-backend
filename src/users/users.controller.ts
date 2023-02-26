@@ -15,7 +15,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { SearchUserDto } from './dto/search-user.dto';
 import { JwtGuard } from 'src/guards/jwt.guard';
 import { User } from './entities/user.entity';
-import { ObjectId } from 'mongoose';
+import { ObjectId, Types } from 'mongoose';
 
 @Controller('users')
 export class UsersController {
@@ -48,7 +48,7 @@ export class UsersController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: ObjectId) {
+  findOne(@Param('id') id: Types.ObjectId) {
     return this.usersService.findOne(id);
   }
 

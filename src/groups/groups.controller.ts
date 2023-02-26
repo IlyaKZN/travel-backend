@@ -1,4 +1,4 @@
-import { ObjectId } from 'mongoose';
+import { ObjectId, Types } from 'mongoose';
 import {
   Controller,
   Get,
@@ -15,6 +15,7 @@ import { CreateGroupDto } from './dto/create-group.dto';
 import { UpdateGroupDto } from './dto/update-group.dto';
 import { SearchGroupDto } from './dto/search-group.dto';
 import { JwtGuard } from 'src/guards/jwt.guard';
+import { UserDocument } from 'src/users/entities/user.entity';
 
 @Controller('groups')
 export class GroupsController {
@@ -31,6 +32,18 @@ export class GroupsController {
     return this.groupsService.search(searchGroupDto);
   }
 
+  @UseGuards(JwtGuard)
+  @Post('/participants')
+  addParticipant(
+    @Body() addParticipantDto: { groupId: Types.ObjectId },
+    @Req() req: { user: UserDocument },
+  ) {
+    return this.groupsService.addParticipant(
+      addParticipantDto.groupId,
+      req.user._id,
+    );
+  }
+
   @Get()
   findAll() {
     return this.groupsService.findAll();
@@ -38,7 +51,15 @@ export class GroupsController {
 
   @Get(':id')
   findOne(@Param('id') id: ObjectId) {
-    return this.groupsService.findOne(id);
+    return this.groupsService.findOne(id).populate({
+      path: 'chat',
+      populate: {
+        path: 'messages',
+        populate: {
+          path: 'owner',
+        },
+      },
+    });
   }
 
   @Patch(':id')

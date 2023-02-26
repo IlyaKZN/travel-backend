@@ -5,6 +5,7 @@ import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { GroupsModule } from './groups/groups.module';
+import { EventsModule } from './events/events.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { GroupsModule } from './groups/groups.module';
     UsersModule,
     AuthModule,
     GroupsModule,
+    EventsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

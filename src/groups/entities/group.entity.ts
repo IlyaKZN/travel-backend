@@ -1,40 +1,48 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Types } from 'mongoose';
+import { IsNotEmpty } from 'class-validator';
 import { User } from 'src/users/entities/user.entity';
 import { Chat } from 'src/chats/entities/chat.entity';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  ManyToMany,
+  OneToOne,
+} from 'typeorm';
 
-export type GroupDocument = HydratedDocument<Group>;
-
-@Schema({ strictQuery: true })
+@Entity()
 export class Group {
-  @Prop({ required: true })
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column()
+  @IsNotEmpty()
   name: string;
 
-  @Prop({ required: true })
+  @Column()
+  @IsNotEmpty()
   password: string;
 
-  @Prop({ required: true })
+  @Column('text', { array: true })
+  @IsNotEmpty()
   waypoints: string[];
 
-  @Prop({ type: String, ref: 'User', required: true })
-  owner: User;
-
-  @Prop({
-    type: [{ type: Types.ObjectId, ref: 'User', required: true }],
-  })
-  participants: User[];
-
-  @Prop()
+  @Column()
+  @IsNotEmpty()
   numberParticipants: number;
 
-  @Prop()
+  @Column()
   minAge: number;
 
-  @Prop()
+  @Column()
   maxAge: number;
 
-  @Prop({ type: Types.ObjectId, ref: 'Chat', required: true })
+  @ManyToOne(() => User, (user) => user.ownerGroups)
+  owner: User;
+
+  @ManyToMany(() => User, (user) => user.groups)
+  participants: User[];
+
+  @OneToOne(() => Chat, (chat) => chat.group)
   chat: Chat;
 }
-
-export const GroupSchema = SchemaFactory.createForClass(Group);

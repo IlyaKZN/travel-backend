@@ -1,61 +1,82 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Schema as MongooseSchema } from 'mongoose';
+import { Message } from './../../chats/entities/message.entity';
 import { Group } from 'src/groups/entities/group.entity';
+import { Chat } from 'src/chats/entities/chat.entity';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  ManyToMany,
+  JoinTable,
+} from 'typeorm';
+import { IsEmail, IsDate, IsNotEmpty } from 'class-validator';
 
-export type UserDocument = HydratedDocument<User>;
-
-@Schema()
+@Entity()
+@Entity()
 export class User {
-  @Prop({ required: true, unique: true })
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column({ unique: true })
+  @IsEmail()
   email: string;
 
-  @Prop({ required: true, select: false })
+  @Column()
+  @IsNotEmpty()
   password: string;
 
-  @Prop({ required: true, unique: true })
+  @Column({ unique: true })
+  @IsNotEmpty()
   phoneNumber: string;
 
-  @Prop({ required: true, unique: true })
+  @Column({ unique: true })
+  @IsNotEmpty()
   username: string;
 
-  @Prop()
+  @Column({
+    default: 'https://i.pravatar.cc/300',
+  })
   avatar: string;
 
-  @Prop()
+  @Column({ nullable: true })
   firstName: string;
 
-  @Prop()
+  @Column({ nullable: true })
   lastName: string;
 
-  @Prop()
+  @Column()
+  @IsDate()
   birthDate: Date;
 
-  @Prop()
+  @Column({ nullable: true })
   friends: string;
 
-  @Prop()
+  @Column({ nullable: true })
   country: string;
 
-  @Prop()
+  @Column({ nullable: true })
   city: string;
 
-  @Prop()
+  @Column({ nullable: true })
   status: string;
 
-  @Prop({
-    type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Group' }],
-  })
+  @OneToMany(() => Group, (group) => group.owner)
+  ownerGroups: Group[];
+
+  @ManyToMany(() => Group, (group) => group.participants)
+  @JoinTable()
   groups: Group[];
 
-  @Prop({
-    type: [{ type: MongooseSchema.Types.ObjectId, ref: 'User' }],
-  })
+  @ManyToMany(() => Chat, (chat) => chat.members)
+  @JoinTable()
+  chats: Chat[];
+
+  @OneToMany(() => Message, (message) => message.owner, { cascade: true })
+  messages: Message[];
+
+  @OneToMany(() => User, (user) => user.subscriptions)
   subscribers: User[];
 
-  @Prop({
-    type: [{ type: MongooseSchema.Types.ObjectId, ref: 'User' }],
-  })
+  @OneToMany(() => User, (user) => user.subscribers)
   subscriptions: User[];
 }
-
-export const UserSchema = SchemaFactory.createForClass(User);

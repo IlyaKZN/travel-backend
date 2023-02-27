@@ -15,13 +15,12 @@ export class AuthController {
   @Post('signin')
   signin(@Req() req) {
     const { access_token: accessToken } = this.authService.auth(req.user);
-    const { ...rest } = req.user;
 
-    delete rest._doc.password;
+    delete req.user.password;
 
     return {
       accessToken,
-      user: rest._doc,
+      user: req.user,
     };
   }
 

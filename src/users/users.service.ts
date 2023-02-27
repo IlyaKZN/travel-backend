@@ -1,7 +1,7 @@
-import { Model, ObjectId, Types } from 'mongoose';
+import { Repository, Like, Not } from 'typeorm';
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { User, UserDocument } from './entities/user.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { SearchUserDto } from './dto/search-user.dto';
@@ -9,56 +9,62 @@ import { hashPassword } from 'src/utils/utils-functions';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
+  constructor(
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
+  ) {}
 
   create(createUserDto: CreateUserDto) {
     const password = hashPassword(createUserDto.password);
-    return this.userModel.create({
+
+    return this.userRepository.save({
       ...createUserDto,
       password,
     });
   }
 
-  search(searchUserDto: SearchUserDto, ownerId: ObjectId) {
+  search(searchUserDto: SearchUserDto, userId: number) {
     const { searchValue } = searchUserDto;
 
-    return this.userModel.find({
-      $or: [
+    return this.userRepository.find({
+      where: [
         {
-          firstName: {
-            $regex: new RegExp(searchValue, 'i'),
-          },
-          _id: { $ne: ownerId },
+          firstName: Like(`%${searchValue}%`),
+          id: Not(userId),
         },
         {
-          lastName: { $regex: new RegExp(searchValue, 'i') },
-          _id: { $ne: ownerId },
+          lastName: Like(`%${searchValue}%`),
+          id: Not(userId),
         },
       ],
     });
   }
 
-  findAll(ownerId: ObjectId) {
-    return this.userModel.find({
-      _id: { $ne: ownerId },
-    });
+  findAll() {
+    return this.userRepository.find();
   }
 
   findByUsername(username: string) {
-    return this.userModel.findOne({ username }).select('+password');
-  }
-
-  findOne(id: Types.ObjectId) {
-    return this.userModel.findById(id);
-  }
-
-  update(id: ObjectId, updateUserDto: UpdateUserDto) {
-    return this.userModel.findByIdAndUpdate(id, updateUserDto, {
-      returnDocument: 'after',
+    return this.userRepository.findOne({
+      where: {
+        username,
+      },
     });
   }
 
-  remove(id: ObjectId) {
-    return this.userModel.findByIdAndRemove(id);
+  findOne(id: number) {
+    return this.userRepository.findOne({
+      where: {
+        id,
+      },
+    });
+  }
+
+  update(id: number, updateUserDto: UpdateUserDto) {
+    return this.userRepository.update(id, updateUserDto);
+  }
+
+  remove(id: number) {
+    return this.userRepository.delete(id);
   }
 }

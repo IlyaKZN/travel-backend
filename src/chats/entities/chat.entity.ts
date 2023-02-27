@@ -1,31 +1,27 @@
+import {
+  Entity,
+  OneToOne,
+  ManyToMany,
+  PrimaryGeneratedColumn,
+  OneToMany,
+  JoinColumn,
+} from 'typeorm';
+import { Group } from 'src/groups/entities/group.entity';
 import { User } from 'src/users/entities/user.entity';
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Schema as MongooseSchema, now } from 'mongoose';
 import { Message } from './message.entity';
 
-export type ChatDocument = HydratedDocument<Chat>;
-
-@Schema()
+@Entity()
 export class Chat {
-  @Prop({
-    type: [
-      { type: MongooseSchema.Types.ObjectId, ref: 'Message', default: [] },
-    ],
-  })
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @OneToMany(() => Message, (message) => message.chat)
   messages: Message[];
 
-  @Prop({
-    type: [
-      { type: MongooseSchema.Types.ObjectId, ref: 'User', required: true },
-    ],
-  })
+  @ManyToMany(() => User, (user) => user.chats)
   members: User[];
 
-  @Prop({ default: now() })
-  createdAt: Date;
-
-  @Prop({ default: now() })
-  updatedAt: Date;
+  @OneToOne(() => Group)
+  @JoinColumn()
+  group: Group;
 }
-
-export const ChatSchema = SchemaFactory.createForClass(Chat);

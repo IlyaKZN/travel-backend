@@ -1,40 +1,59 @@
-import { Model, Types } from 'mongoose';
+import { User } from 'src/users/entities/user.entity';
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Chat, ChatDocument } from './entities/chat.entity';
-import { Message, MessageDocument } from './entities/message.entity';
+import { Chat } from './entities/chat.entity';
+import { Message } from './entities/message.entity';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { CreateGroupDto } from './dto/create-group.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class ChatsService {
   constructor(
-    @InjectModel(Chat.name) private chatModel: Model<ChatDocument>,
-    @InjectModel(Message.name) private messageModel: Model<MessageDocument>,
+    @InjectRepository(Chat)
+    private chatRepository: Repository<Chat>,
+    @InjectRepository(Message)
+    private messageRepository: Repository<Message>,
+    private usersService: UsersService,
   ) {}
 
-  createChart(createGroupDto: CreateGroupDto) {
-    return this.chatModel.create({
-      members: createGroupDto.members,
+  createChat(createGroupDto: CreateGroupDto) {
+    return this.chatRepository.save({
+      members: [...createGroupDto.members],
     });
   }
 
   async createMessage(createUserDto: CreateMessageDto) {
     const { text, userId, chatId } = createUserDto;
 
-    const message = await this.messageModel.create({
-      text,
-      owner: userId,
+    const chat = await this.chatRepository.findOne({
+      where: {
+        id: chatId,
+      },
     });
 
-    if (message) {
-      this.chatModel
-        .findByIdAndUpdate(chatId, {
-          $push: { messages: message._id },
-        })
-        .catch((err) => console.log(err));
-    }
+    const owner = await this.usersService.findOne(userId);
 
-    return message;
+    return this.messageRepository.save({
+      text,
+      owner,
+      chat,
+    });
+  }
+
+  findOne(id: number, user: User) {
+    console.log(id, user);
+
+    return this.chatRepository.findOne({
+      where: {
+        id,
+        members: [{ id: user.id }],
+      },
+      relations: {
+        messages: true,
+        members: true,
+      },
+    });
   }
 }

@@ -15,7 +15,6 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { SearchUserDto } from './dto/search-user.dto';
 import { JwtGuard } from 'src/guards/jwt.guard';
 import { User } from './entities/user.entity';
-import { ObjectId, Types } from 'mongoose';
 
 @Controller('users')
 export class UsersController {
@@ -31,9 +30,9 @@ export class UsersController {
   @Post('/search')
   search(
     @Body() searchUserDto: SearchUserDto,
-    @Req() req: { user: User & { _id: ObjectId } },
+    @Req() req: { user: User & { id: number } },
   ) {
-    return this.usersService.search(searchUserDto, req.user._id);
+    return this.usersService.search(searchUserDto, req.user.id);
   }
 
   @Post()
@@ -43,37 +42,26 @@ export class UsersController {
 
   @UseGuards(JwtGuard)
   @Get()
-  findAll(@Req() req: { user: User & { _id: ObjectId } }) {
-    return this.usersService.findAll(req.user._id);
+  findAll() {
+    return this.usersService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: Types.ObjectId) {
+  findOne(@Param('id') id: number) {
     return this.usersService.findOne(id);
   }
 
   @UseGuards(JwtGuard)
   @Patch('/me')
   update(
-    @Req() req: { user: User & { _id: ObjectId } },
+    @Req() req: { user: User & { id: number } },
     @Body() updateUserDto: UpdateUserDto,
   ) {
-    return this.usersService.update(req.user._id, updateUserDto);
+    return this.usersService.update(req.user.id, updateUserDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: ObjectId) {
+  remove(@Param('id') id: number) {
     return this.usersService.remove(id);
   }
-
-  // @UseGuards(JwtGuard)
-  // @Patch('/subscribe')
-  // subscribe(
-  //   @Req() req: { user: User & { _id: ObjectId } },
-  //   @Body() subscribeUserDto: SubscribeUserDto,
-  // ) {
-  //   return this.usersService.update(req.user._id, {
-  //     subscriptions: [subscribeUserDto.]
-  //   })
-  // }
 }

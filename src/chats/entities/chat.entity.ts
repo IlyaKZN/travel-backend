@@ -1,31 +1,20 @@
+import { Group } from 'src/groups/entities/group.entity';
+import { IsNotEmpty } from 'class-validator/types/decorator/decorators';
 import { User } from 'src/users/entities/user.entity';
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Schema as MongooseSchema, now } from 'mongoose';
+import { Entity, Column, OneToOne, ManyToMany } from 'typeorm';
 import { Message } from './message.entity';
 
-export type ChatDocument = HydratedDocument<Chat>;
-
-@Schema()
+@Entity()
 export class Chat {
-  @Prop({
-    type: [
-      { type: MongooseSchema.Types.ObjectId, ref: 'Message', default: [] },
-    ],
-  })
+  @Column()
   messages: Message[];
 
-  @Prop({
-    type: [
-      { type: MongooseSchema.Types.ObjectId, ref: 'User', required: true },
-    ],
-  })
+  @Column()
+  @IsNotEmpty()
+  @ManyToMany(() => User, (user) => user.chats)
   members: User[];
 
-  @Prop({ default: now() })
-  createdAt: Date;
-
-  @Prop({ default: now() })
-  updatedAt: Date;
+  @Column()
+  @OneToOne(() => Group, (group) => group.chat)
+  group: Group;
 }
-
-export const ChatSchema = SchemaFactory.createForClass(Chat);

@@ -35,6 +35,6 @@ export class ChatsService {
         .catch((err) => console.log(err));
     }
 
-    return message;
+    return message.populate('owner');
   }
 }

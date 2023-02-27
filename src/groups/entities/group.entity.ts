@@ -23,10 +23,12 @@ export class Group {
   @IsNotEmpty()
   password: string;
 
-  @Column()
+  @Column('text', { array: true })
   @IsNotEmpty()
   waypoints: string[];
 
+  @Column()
+  @IsNotEmpty()
   @Column()
   @IsNotEmpty()
   numberParticipants: number;
@@ -37,18 +39,12 @@ export class Group {
   @Column()
   maxAge: number;
 
-  @Column()
-  @IsNotEmpty()
   @ManyToOne(() => User, (user) => user.ownerGroups)
   owner: User;
 
-  @Column()
-  @IsNotEmpty()
   @ManyToMany(() => User, (user) => user.groups)
-  members: User[];
+  participants: User[];
 
-  @Column()
-  @IsNotEmpty()
   @OneToOne(() => Chat, (chat) => chat.group)
   chat: Chat;
 }

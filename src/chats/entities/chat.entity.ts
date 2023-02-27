@@ -1,20 +1,28 @@
+import {
+  Entity,
+  OneToOne,
+  ManyToMany,
+  PrimaryGeneratedColumn,
+  OneToMany,
+  JoinColumn,
+} from 'typeorm';
 import { Group } from 'src/groups/entities/group.entity';
-import { IsNotEmpty } from 'class-validator/types/decorator/decorators';
 import { User } from 'src/users/entities/user.entity';
-import { Entity, Column, OneToOne, ManyToMany } from 'typeorm';
 import { Message } from './message.entity';
 
 @Entity()
+@Entity()
 export class Chat {
-  @Column()
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @OneToMany(() => Message, (message) => message.chat)
   messages: Message[];
 
-  @Column()
-  @IsNotEmpty()
   @ManyToMany(() => User, (user) => user.chats)
   members: User[];
 
-  @Column()
-  @OneToOne(() => Group, (group) => group.chat)
+  @OneToOne(() => Group)
+  @JoinColumn()
   group: Group;
 }

@@ -1,5 +1,4 @@
 import { PartialType } from '@nestjs/mapped-types';
-import { ObjectId } from 'mongoose';
 import { CreateUserDto } from './create-user.dto';
 
 export class UpdateUserDto extends PartialType(CreateUserDto) {
@@ -14,5 +13,4 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
   country: string;
   city: string;
   status: string;
-  subscriptions: ObjectId[];
 }

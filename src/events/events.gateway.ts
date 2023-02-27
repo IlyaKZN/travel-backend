@@ -3,13 +3,13 @@ import {
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
+  ConnectedSocket,
 } from '@nestjs/websockets';
-import { Server } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 import { EventsService } from './events.service';
 import { UsersService } from 'src/users/users.service';
 import { WsJwtGuard } from 'src/guards/jwtWS.guard';
 import { UseGuards, Req } from '@nestjs/common';
-import mongoose from 'mongoose';
 
 @WebSocketGateway(3001, {
   cors: true,
@@ -24,21 +24,31 @@ export class EventsGateway {
   server: Server;
 
   @UseGuards(WsJwtGuard)
-  @SubscribeMessage('message')
+  @SubscribeMessage('groupMessage')
   async createMessage(
-    socket: any,
-    @MessageBody() data: { text: string; chatId: string },
-    @Req() request: { userId: string },
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() data: { text: string; chatId: number },
+    @Req() request: { userId: number },
   ) {
-    const id = new mongoose.Types.ObjectId(request.userId);
-    const user = await this.usersService.findOne(id);
+    const { userId } = request;
+    const { text, chatId } = data;
 
     const message = await this.eventsService.createMessage({
-      text: data.text,
-      userId: user._id,
-      chatId: data.chatId,
+      text,
+      userId,
+      chatId,
     });
 
-    this.server.send('message', message);
+    this.server.to(`${chatId}`).emit('groupMessage', message);
+  }
+
+  @UseGuards(WsJwtGuard)
+  @SubscribeMessage('subscribe')
+  async subscribeHandler(
+    @ConnectedSocket() socket: Socket,
+    @Req() request: { userId: number },
+    @MessageBody() data: { event: string; chatId: number },
+  ) {
+    if (data.event === 'groupMessage') socket.join(`${data.chatId}`);
   }
 }

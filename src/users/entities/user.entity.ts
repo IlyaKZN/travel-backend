@@ -7,9 +7,11 @@ import {
   Column,
   OneToMany,
   ManyToMany,
+  JoinTable,
 } from 'typeorm';
 import { IsEmail, IsDate, IsNotEmpty } from 'class-validator';
 
+@Entity()
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
@@ -31,52 +33,52 @@ export class User {
   @IsNotEmpty()
   username: string;
 
-  @Column()
+  @Column({
+    default: 'https://i.pravatar.cc/300',
+  })
   avatar: string;
 
-  @Column()
+  @Column({ nullable: true })
   firstName: string;
 
-  @Column()
+  @Column({ nullable: true })
   lastName: string;
 
   @Column()
   @IsDate()
+  @Column()
+  @IsDate()
   birthDate: Date;
 
-  @Column()
+  @Column({ nullable: true })
   friends: string;
 
-  @Column()
+  @Column({ nullable: true })
   country: string;
 
-  @Column()
+  @Column({ nullable: true })
   city: string;
 
-  @Column()
+  @Column({ nullable: true })
   status: string;
 
-  @Column()
   @OneToMany(() => Group, (group) => group.owner)
   ownerGroups: Group[];
 
-  @Column()
-  @ManyToMany(() => Group, (group) => group.members)
+  @ManyToMany(() => Group, (group) => group.participants)
+  @JoinTable()
   groups: Group[];
 
-  @Column()
   @ManyToMany(() => Chat, (chat) => chat.members)
+  @JoinTable()
   chats: Chat[];
 
-  @Column()
-  @OneToMany(() => Message, (message) => message.owner)
+  @OneToMany(() => Message, (message) => message.owner, { cascade: true })
   messages: Message[];
 
-  @Column()
   @OneToMany(() => User, (user) => user.subscriptions)
   subscribers: User[];
 
-  @Column()
   @OneToMany(() => User, (user) => user.subscribers)
   subscriptions: User[];
 }

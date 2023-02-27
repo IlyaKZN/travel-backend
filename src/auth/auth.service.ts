@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { User } from '../users/entities/user.entity';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
-import { Types } from 'mongoose';
 import { compare } from 'bcryptjs';
 
 @Injectable()
@@ -12,8 +11,8 @@ export class AuthService {
     private usersService: UsersService,
   ) {}
 
-  auth(user: User & { _id: Types.ObjectId }) {
-    const payload = { sub: user._id };
+  auth(user: User & { id: number }) {
+    const payload = { sub: user.id };
 
     return { access_token: this.jwtService.sign(payload) };
   }

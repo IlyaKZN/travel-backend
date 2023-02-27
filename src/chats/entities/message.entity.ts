@@ -1,26 +1,17 @@
+import { Entity, Column, ManyToOne } from 'typeorm';
 import { User } from 'src/users/entities/user.entity';
-// import { Chat } from './chat.entity';
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Schema as MongooseSchema, now } from 'mongoose';
+import { Chat } from './chat.entity';
 
-export type MessageDocument = HydratedDocument<Message>;
-
-@Schema()
+@Entity()
 export class Message {
-  @Prop({ required: true })
+  @Column()
   text: string;
 
-  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User', required: true })
+  @Column()
+  @ManyToOne(() => User, (user) => user.messages)
   owner: User;
 
-  // @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Chat', required: true })
-  // chat: Chat;
-
-  @Prop({ default: now() })
-  createdAt: Date;
-
-  @Prop({ default: now() })
-  updatedAt: Date;
+  @Column()
+  @ManyToOne(() => Chat, (chat) => chat.messages)
+  chat: Chat;
 }
-
-export const MessageSchema = SchemaFactory.createForClass(Message);

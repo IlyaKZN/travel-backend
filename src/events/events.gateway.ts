@@ -41,13 +41,4 @@ export class EventsGateway {
 
     this.server.send('message', message);
   }
-
-  @SubscribeMessage('identity')
-  async identity(@MessageBody() data: number): Promise<number> {
-    return data;
-  }
-
-  onModuleInit() {
-    this.server.emit('message', 'test');
-  }
 }

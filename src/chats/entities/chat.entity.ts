@@ -11,7 +11,6 @@ import { User } from 'src/users/entities/user.entity';
 import { Message } from './message.entity';
 
 @Entity()
-@Entity()
 export class Chat {
   @PrimaryGeneratedColumn()
   id: number;

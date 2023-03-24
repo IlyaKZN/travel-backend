@@ -29,8 +29,6 @@ export class Group {
 
   @Column()
   @IsNotEmpty()
-  @Column()
-  @IsNotEmpty()
   numberParticipants: number;
 
   @Column()

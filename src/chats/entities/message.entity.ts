@@ -1,17 +1,18 @@
-import { Entity, Column, ManyToOne } from 'typeorm';
+import { Entity, Column, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { Chat } from './chat.entity';
 
 @Entity()
 export class Message {
+  @PrimaryGeneratedColumn()
+  id: number;
+
   @Column()
   text: string;
 
-  @Column()
-  @ManyToOne(() => User, (user) => user.messages)
+  @ManyToOne(() => User, (user) => user.messages, { eager: true })
   owner: User;
 
-  @Column()
   @ManyToOne(() => Chat, (chat) => chat.messages)
   chat: Chat;
 }

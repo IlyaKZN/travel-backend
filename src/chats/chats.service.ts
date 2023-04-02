@@ -3,10 +3,11 @@ import { Injectable } from '@nestjs/common';
 import { Chat } from './entities/chat.entity';
 import { Message } from './entities/message.entity';
 import { CreateMessageDto } from './dto/create-message.dto';
-import { CreateGroupDto } from './dto/create-group.dto';
+import { CreateChatDto } from './dto/create-chat.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, In, IsNull, Equal } from 'typeorm';
 import { UsersService } from 'src/users/users.service';
+import { FindChatDto } from './dto/find-chat.dto';
 
 @Injectable()
 export class ChatsService {
@@ -18,9 +19,11 @@ export class ChatsService {
     private usersService: UsersService,
   ) {}
 
-  createChat(createGroupDto: CreateGroupDto) {
+  async createChat(createChatDto: CreateChatDto) {
+    const users = await this.usersService.findMany(createChatDto.members);
+
     return this.chatRepository.save({
-      members: [...createGroupDto.members],
+      members: users,
     });
   }
 
@@ -42,9 +45,7 @@ export class ChatsService {
     });
   }
 
-  findOne(id: number, user: User) {
-    console.log(id, user);
-
+  findById(id: number, user: User) {
     return this.chatRepository.findOne({
       where: {
         id,
@@ -55,5 +56,33 @@ export class ChatsService {
         members: true,
       },
     });
+  }
+
+  async findOne(findChatDto: FindChatDto) {
+    if (findChatDto.type === 'dialog') {
+      const chats = await this.chatRepository.find({
+        relations: {
+          members: true,
+        },
+        where: {
+          members: {
+            id: In(findChatDto.members),
+          },
+          group: IsNull(),
+        },
+      });
+
+      return chats.find((chat) =>
+        chat.members.find((member) => member.id === findChatDto.members[1]),
+      );
+    } else {
+      return this.chatRepository.findOne({
+        where: {
+          members: {
+            id: In(findChatDto.members),
+          },
+        },
+      });
+    }
   }
 }

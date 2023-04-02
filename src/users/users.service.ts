@@ -1,4 +1,4 @@
-import { Repository, Like, Not } from 'typeorm';
+import { Repository, Like, Not, In } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
@@ -56,6 +56,14 @@ export class UsersService {
     return this.userRepository.findOne({
       where: {
         id,
+      },
+    });
+  }
+
+  findMany(ids: number[]) {
+    return this.userRepository.find({
+      where: {
+        id: In(ids),
       },
     });
   }

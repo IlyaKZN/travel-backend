@@ -21,7 +21,7 @@ export class GroupsService {
 
   async create(createGroupDto: CreateGroupDto, owner: User) {
     const chat = await this.chatsService.createChat({
-      members: [owner],
+      members: [owner.id],
     });
 
     return this.groupRepository.save({

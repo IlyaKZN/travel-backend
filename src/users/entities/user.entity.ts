@@ -12,7 +12,6 @@ import {
 import { IsEmail, IsDate, IsNotEmpty } from 'class-validator';
 
 @Entity()
-@Entity()
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
@@ -44,8 +43,6 @@ export class User {
   @Column({ nullable: true })
   lastName: string;
 
-  @Column()
-  @IsDate()
   @Column()
   @IsDate()
   birthDate: Date;
